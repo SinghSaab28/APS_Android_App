@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "63355554299",
+    "firebase_url": "https://fiery-muse-287609.firebaseio.com",
+    "project_id": "fiery-muse-287609",
+    "storage_bucket": "fiery-muse-287609.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:63355554299:android:c632662504f870540e235e",
+        "android_client_info": {
+          "package_name": "com.android.apsschool"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "63355554299-u7fr36sjgc23rnl0a6ee93ci4vv3htma.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBwFBgvB9RiPEI75iyrTlrbDfdzToh9gUs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "63355554299-u7fr36sjgc23rnl0a6ee93ci4vv3htma.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
