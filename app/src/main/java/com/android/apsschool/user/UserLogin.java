@@ -46,23 +46,28 @@ public class UserLogin extends AppCompatActivity {
                         if (task.isSuccessful() && !task.getResult().isEmpty()) {
                             DBActivities dbActivities = new DBActivities(getApplicationContext());
                             List<Student> students = task.getResult().toObjects(Student.class);
-                            if (students.get(0).LOGIN_FLAG == false) {
-                                if (password.getText().toString().equals(students.get(0).PASSWORD)) {
-                                    updateLoginFlag();
-                                    Log.d("UserLogin", "onComplete: " + students.get(0).NAME);
-                                    if (!dbActivities.verifyStudent(rollno.getText().toString())) {
-                                        dbActivities.addStudent(getApplicationContext(), students.get(0));
+                            if(students.get(0).PERMISSION==true) {
+                                if (students.get(0).LOGIN_FLAG == false) {
+                                    if (password.getText().toString().equals(students.get(0).PASSWORD)) {
+                                        updateLoginFlag();
+                                        Log.d("UserLogin", "onComplete: " + students.get(0).NAME);
+                                        if (!dbActivities.verifyStudent(rollno.getText().toString())) {
+                                            dbActivities.addStudent(getApplicationContext(), students.get(0));
+                                        }
+                                        Intent i = new Intent(getApplicationContext(), SelectSubject.class);
+                                        startActivity(i);
+                                        finish();
+                                    } else {
+                                        Log.d("UserLogin", "login : Password is incorrect for : " + students.get(0).ROLLNUMBER);
+                                        Toast toast = Toast.makeText(getApplicationContext(), "Roll number or Password incorrect. Please try again with correct credentials...", Toast.LENGTH_LONG);
+                                        toast.show();
                                     }
-                                    Intent i = new Intent(getApplicationContext(), SelectSubject.class);
-                                    startActivity(i);
-                                    finish();
                                 } else {
-                                    Log.d("UserLogin", "login : Password is incorrect for : " + students.get(0).ROLLNUMBER);
-                                    Toast toast = Toast.makeText(getApplicationContext(), "Roll number or Password incorrect. Please try again with correct credentials...", Toast.LENGTH_LONG);
+                                    Toast toast = Toast.makeText(getApplicationContext(), "Only one device is allowed to login. This user is already logged in...", Toast.LENGTH_LONG);
                                     toast.show();
                                 }
-                            } else {
-                                Toast toast = Toast.makeText(getApplicationContext(), "Only one device is allowed to login. This user is already logged in...", Toast.LENGTH_LONG);
+                            }else{
+                                Toast toast = Toast.makeText(getApplicationContext(), "You are not permitted to login. Please contact school admin...", Toast.LENGTH_LONG);
                                 toast.show();
                             }
                         } else {
@@ -76,15 +81,6 @@ public class UserLogin extends AppCompatActivity {
     }
 
     private void updateLoginFlag() {
-//        DocumentReference student = db.collection("students").document(rollno.getText().toString());
-//        student.update("LOGIN_FLAG", true)
-//                .addOnSuccessListener(new OnSuccessListener<Void>() {
-//                    @Override
-//                    public void onSuccess(Void aVoid) {
-//                        Toast.makeText(UserLogin.this, "Updated Successfully", Toast.LENGTH_SHORT).show();
-//                        Log.d("UserLogin", "updateLoginFlag : LOGIN_FLAG updated to true.");
-//                    }
-//                });
         db.collection("students").whereEqualTo("ROLLNUMBER", rollno.getText().toString())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {

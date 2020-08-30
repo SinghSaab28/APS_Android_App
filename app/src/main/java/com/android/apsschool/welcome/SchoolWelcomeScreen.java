@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -53,14 +54,19 @@ public class SchoolWelcomeScreen extends AppCompatActivity {
                                 if (task.isSuccessful() && !task.getResult().isEmpty()) {
                                     List<Student> students = task.getResult().toObjects(Student.class);
                                     STUDENT = students.get(0);
-                                    if(STUDENT.LOGIN_FLAG==true){
-                                        Log.d("SchoolWelcomeScreen", "onCreate: Student login flag = true");
-                                        Intent i = new Intent(getApplicationContext(), SelectSubject.class);
-                                        startActivity(i);
-                                        finish();
-                                    } else {
-                                        Log.d("SchoolWelcomeScreen", "onCreate: Diverted to Login Page : 1");
-                                        divertToUserLogin();
+                                    if(students.get(0).PERMISSION==true) {
+                                        if(STUDENT.LOGIN_FLAG==true){
+                                            Log.d("SchoolWelcomeScreen", "onCreate: Student login flag = true");
+                                            Intent i = new Intent(getApplicationContext(), SelectSubject.class);
+                                            startActivity(i);
+                                            finish();
+                                        } else {
+                                            Log.d("SchoolWelcomeScreen", "onCreate: Diverted to Login Page : 1");
+                                            divertToUserLogin();
+                                        }
+                                    }else{
+                                        Toast toast = Toast.makeText(getApplicationContext(), "You are restricted from login permissions. Please contact school admin...", Toast.LENGTH_LONG);
+                                        toast.show();
                                     }
                                 } else {
                                     Log.d("SchoolWelcomeScreen", "onCreate: Diverted to Login Page : 2");

@@ -42,13 +42,11 @@ import com.google.android.gms.ads.initialization.OnInitializationCompleteListene
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -182,63 +180,59 @@ public class SelectCourse extends AppCompatActivity {
         postedBy.setTextColor(Color.parseColor("#ffffff"));
         postedBy.setTextSize(15);
 
-        String availabilityDate = course.DATE_TIME_OF_AVAILABILITY;
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy;HH:mm");
-        try {
-            Date date = format.parse(availabilityDate);
-            System.out.println("Date & Time : "+date);
+        Date availabilityDate = course.DATE_TIME_OF_AVAILABILITY;
+//        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy;HH:mm");
+        //            Date date = format.parse(availabilityDate);
+//            System.out.println("Date & Time : "+date);
 
-            Calendar start_calendar = Calendar.getInstance();
-            Calendar end_calendar;
+        Calendar start_calendar = Calendar.getInstance();
+        Calendar end_calendar;
 
-            // convert date to calendar
-            Calendar c = Calendar.getInstance();
-            c.setTime(date);
+        // convert date to calendar
+        Calendar c = Calendar.getInstance();
+        c.setTime(availabilityDate);
 
-            // manipulate date
-            c.add(Calendar.DATE, 2); //same with c.add(Calendar.DAY_OF_MONTH, 1);
+        // manipulate date
+        c.add(Calendar.DATE, 2); //same with c.add(Calendar.DAY_OF_MONTH, 1);
 
-            // convert calendar to date
-            end_calendar = c;
-            Date currentDatePlusTwo = c.getTime();
-            System.out.println("Date & Time Plus 2 days : "+currentDatePlusTwo);
-            long start_millis = start_calendar.getTimeInMillis(); //get the start time in milliseconds
-            long end_millis = end_calendar.getTimeInMillis(); //get the end time in milliseconds
-            long total_millis = (end_millis - start_millis); //total time in milliseconds
-            CountDownTimer cdt = new CountDownTimer(total_millis, 1000) {
-                @Override
-                public void onTick(long millisUntilFinished) {
-                    long days = TimeUnit.MILLISECONDS.toDays(millisUntilFinished);
-                    millisUntilFinished -= TimeUnit.DAYS.toMillis(days);
+        // convert calendar to date
+        end_calendar = c;
+        Date currentDatePlusTwo = c.getTime();
+        System.out.println("Date & Time Plus 2 days : "+currentDatePlusTwo);
+        long start_millis = start_calendar.getTimeInMillis(); //get the start time in milliseconds
+        long end_millis = end_calendar.getTimeInMillis(); //get the end time in milliseconds
+        long total_millis = (end_millis - start_millis); //total time in milliseconds
+        CountDownTimer cdt = new CountDownTimer(total_millis, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                long days = TimeUnit.MILLISECONDS.toDays(millisUntilFinished);
+                millisUntilFinished -= TimeUnit.DAYS.toMillis(days);
 
-                    long hours = TimeUnit.MILLISECONDS.toHours(millisUntilFinished);
-                    millisUntilFinished -= TimeUnit.HOURS.toMillis(hours);
+                long hours = TimeUnit.MILLISECONDS.toHours(millisUntilFinished);
+                millisUntilFinished -= TimeUnit.HOURS.toMillis(hours);
 
-                    long minutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished);
-                    millisUntilFinished -= TimeUnit.MINUTES.toMillis(minutes);
+                long minutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished);
+                millisUntilFinished -= TimeUnit.MINUTES.toMillis(minutes);
 
-                    long seconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished);
-                    if(days>0){
-                        countDownTimer.setText("Expires in : "+ days + "Days " + hours + "Hrs");
-                        countDownTimer.setTextColor(Color.parseColor("#00FF00"));
-                    } else if(hours>0){
-                        countDownTimer.setText("Expires in : "+ hours + "Hrs " + minutes + "Mins");
-                        countDownTimer.setTextColor(Color.parseColor("#FF7F50"));
-                    } else if (minutes>0){
-                        countDownTimer.setText("Expires in : "+ minutes + "Mins " + seconds + "Secs");
-                    }
+                long seconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished);
+                if(days>0){
+                    countDownTimer.setText("Expires in : "+ days + "Days " + hours + "Hrs");
+                    countDownTimer.setTextColor(Color.parseColor("#00FF00"));
+                } else if(hours>0){
+                    countDownTimer.setText("Expires in : "+ hours + "Hrs " + minutes + "Mins");
+                    countDownTimer.setTextColor(Color.parseColor("#FF7F50"));
+                } else if (minutes>0){
+                    countDownTimer.setText("Expires in : "+ minutes + "Mins " + seconds + "Secs");
+                }
 //                    countDownTimer.setText(days + ":" + hours + ":" + minutes + ":" + seconds); //You can compute the millisUntilFinished on hours/minutes/seconds
-                }
+            }
 
-                @Override
-                public void onFinish() {
-                    countDownTimer.setText("Course Expired!");
-                }
-            };
-            cdt.start();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+            @Override
+            public void onFinish() {
+                countDownTimer.setText("Course Expired!");
+            }
+        };
+        cdt.start();
         myLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -253,14 +247,8 @@ public class SelectCourse extends AppCompatActivity {
         VIDEO_SELECTED = course.VIDEO_NAME;
         Date currentDateTime = Calendar.getInstance().getTime();
         Log.d("SelectCourse", "onCourseClick: currentDateTime = "+currentDateTime);
-        String availabilityDateStr = course.DATE_TIME_OF_AVAILABILITY;
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy;HH:mm");
-        Date availabilityDate = null;
-        try {
-            availabilityDate = format.parse(availabilityDateStr);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        Date availabilityDate = course.DATE_TIME_OF_AVAILABILITY;
+//        SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd yyyy HH:mm:ss zzzz");
         if(currentDateTime.compareTo(availabilityDate) >= 0) {
             SELECTED_VIDEO_AVAILABILITY=true;
             Intent i = new Intent(getApplicationContext(), MainActivity.class);
@@ -287,13 +275,27 @@ public class SelectCourse extends AppCompatActivity {
     }
 
     private void updateLoginFlag() {
-        DocumentReference student = db.collection("students").document((new DBActivities(getApplicationContext())).getStudentRollNo());
-        student.update("LOGIN_FLAG", false)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
+        db.collection("students").whereEqualTo("ROLLNUMBER", (new DBActivities(getApplicationContext())).getStudentRollNo())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
-                    public void onSuccess(Void aVoid) {
-                        Toast.makeText(SelectCourse.this, "Updated Successfully", Toast.LENGTH_SHORT).show();
-                        Log.d("SelectCourse", "updateLoginFlag : LOGIN_FLAG updated to false.");
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            if(task.getResult().size()==1) {
+                                System.out.println("jagga");
+                                for (DocumentSnapshot document : task.getResult()) {
+                                    String id = document.getId();
+                                    db.collection("students").document(id).update("LOGIN_FLAG", false) //Set student object
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Toast.makeText(SelectCourse.this, "Updated Successfully", Toast.LENGTH_SHORT).show();
+                                                    Log.d("SelectCourse", "updateLoginFlag : LOGIN_FLAG updated to false.");
+                                                }
+                                            });
+                                }
+                            }
+                        }
                     }
                 });
         Intent i = new Intent(this, UserLogin.class);

@@ -8,7 +8,7 @@ public class Student {
     public String NAME;
     public String PASSWORD;
     public Boolean LOGIN_FLAG;
-    public String PERMISSION;
+    public Boolean PERMISSION;
 
     public Student() {};
 

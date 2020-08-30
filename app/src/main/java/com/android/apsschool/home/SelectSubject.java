@@ -28,19 +28,16 @@ import com.android.apsschool.user.UserLogin;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdLoader;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.VideoController;
 import com.google.android.gms.ads.VideoOptions;
 import com.google.android.gms.ads.formats.MediaView;
 import com.google.android.gms.ads.formats.NativeAdOptions;
 import com.google.android.gms.ads.formats.UnifiedNativeAd;
 import com.google.android.gms.ads.formats.UnifiedNativeAdView;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -81,7 +78,6 @@ public class SelectSubject extends AppCompatActivity {
             arr = subjectList;
         }else {
             System.out.println("else me andr aaya");
-//            FirebaseFirestore db = FirebaseFirestore.getInstance();
             db.collection("class").whereEqualTo("CLASS", dbActivities.getStudentClass())
                     .get()
                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -121,17 +117,17 @@ public class SelectSubject extends AppCompatActivity {
         class_id = findViewById(R.id.class_id);
         class_id.setText("Class : "+dbActivities.getStudentClass());
 
-        MobileAds.initialize(getApplicationContext(), new OnInitializationCompleteListener() {
-            @Override
-            public void onInitializationComplete(InitializationStatus initializationStatus) {
-            }
-        });
-        handler.postDelayed(new Runnable() {
-            public void run() {
-                refreshAd();
-            }
-        }, 60000);
-        refreshAd();
+//        MobileAds.initialize(getApplicationContext(), new OnInitializationCompleteListener() {
+//            @Override
+//            public void onInitializationComplete(InitializationStatus initializationStatus) {
+//            }
+//        });
+//        handler.postDelayed(new Runnable() {
+//            public void run() {
+//                refreshAd();
+//            }
+//        }, 60000);
+//        refreshAd();
 
         logOut.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -413,13 +409,27 @@ public class SelectSubject extends AppCompatActivity {
 
     private void updateLoginFlag() {
         System.out.println("updateLoginFlag me aaya");
-        DocumentReference student = db.collection("students").document((new DBActivities(getApplicationContext())).getStudentRollNo());
-        student.update("LOGIN_FLAG", false)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
+        db.collection("students").whereEqualTo("ROLLNUMBER", (new DBActivities(getApplicationContext())).getStudentRollNo())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
-                    public void onSuccess(Void aVoid) {
-                        Toast.makeText(SelectSubject.this, "Updated Successfully", Toast.LENGTH_SHORT).show();
-                        Log.d("SelectSubject", "updateLoginFlag : LOGIN_FLAG updated to false.");
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            if(task.getResult().size()==1) {
+                                System.out.println("jagga");
+                                for (DocumentSnapshot document : task.getResult()) {
+                                    String id = document.getId();
+                                    db.collection("students").document(id).update("LOGIN_FLAG", false) //Set student object
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Toast.makeText(SelectSubject.this, "Updated Successfully", Toast.LENGTH_SHORT).show();
+                                                    Log.d("SelectSubject", "updateLoginFlag : LOGIN_FLAG updated to false.");
+                                                }
+                                            });
+                                }
+                            }
+                        }
                     }
                 });
         Intent i = new Intent(this, UserLogin.class);
