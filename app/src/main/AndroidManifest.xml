@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.android.apsschool.user">
+    package="com.aps.apsschool.user">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -13,35 +13,35 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
 
-        <activity android:name="com.android.apsschool.welcome.BlankWelcomeScreen">
+        <activity android:name="com.aps.apsschool.welcome.BlankWelcomeScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.android.apsschool.welcome.SchoolWelcomeScreen">
+        <activity android:name="com.aps.apsschool.welcome.SchoolWelcomeScreen">
             <intent-filter>
-                <action android:name="com.android.apsschool.welcome.SchoolWelcomeScreen" />
+                <action android:name="com.aps.apsschool.welcome.SchoolWelcomeScreen" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name="com.android.apsschool.home.SelectCourse">
+        <activity android:name="com.aps.apsschool.home.SelectCourse">
             <intent-filter>
-                <action android:name="com.android.apsschool.home.SelectCourse" />
+                <action android:name="com.aps.apsschool.home.SelectCourse" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".UserLogin">
+        <activity android:name="com.aps.apsschool.user.UserLogin">
             <intent-filter>
                 <action android:name="com.android.apsschool.user.UserLogin" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name="com.android.apsschool.home.SelectSubject">
+        <activity android:name="com.aps.apsschool.home.SelectSubject">
             <intent-filter>
                 <action android:name="com.android.apsschool.home.SelectSubject" />
 
@@ -49,7 +49,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.android.apsschool.home.MainActivity"
+            android:name="com.aps.apsschool.home.MainActivity"
             android:configChanges="orientation|screenSize">
             <intent-filter>
                 <action android:name="com.android.apsschool.home.MainActivity" />
