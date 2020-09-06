@@ -54,12 +54,13 @@ public class SchoolWelcomeScreen extends AppCompatActivity {
                                 if (task.isSuccessful() && !task.getResult().isEmpty()) {
                                     List<Student> students = task.getResult().toObjects(Student.class);
                                     STUDENT = students.get(0);
-                                    if(students.get(0).PERMISSION==true) {
+                                    if(STUDENT.PERMISSION==true) {
+                                        Log.d("SchoolWelcomeScreen", "onCreate: Student permission = true");
                                         if(STUDENT.LOGIN_FLAG==true){
                                             Log.d("SchoolWelcomeScreen", "onCreate: Student login flag = true");
-                                            Intent i = new Intent(getApplicationContext(), SelectSubject.class);
-                                            startActivity(i);
-                                            finish();
+                                                Intent i = new Intent(getApplicationContext(), SelectSubject.class);
+                                                startActivity(i);
+                                                finish();
                                         } else {
                                             Log.d("SchoolWelcomeScreen", "onCreate: Diverted to Login Page : 1");
                                             divertToUserLogin();

@@ -9,6 +9,7 @@ public class Student {
     public String PASSWORD;
     public Boolean LOGIN_FLAG;
     public Boolean PERMISSION;
+    public String IMEI;
 
     public Student() {};
 

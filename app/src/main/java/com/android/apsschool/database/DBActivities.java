@@ -179,6 +179,20 @@ public class DBActivities extends AppCompatActivity {
         return division;
     }
 
+    public String getStudentMedium() {
+        String medium=null;
+        Cursor cursor = getStudentDBCursor();
+        while(cursor.moveToNext()) {
+            if(cursor.getString(2)==null || cursor.getString(2).equalsIgnoreCase("")){
+                break;
+            }
+            Log.d("DBActivities","getStudentClass : Class : "+cursor.getString(2));
+            medium=cursor.getString(2);
+        }
+        cursor.close();
+        return medium;
+    }
+
     public String getStudentRollNo() {
         String rollNo=null;
         Cursor cursor = getStudentDBCursor();

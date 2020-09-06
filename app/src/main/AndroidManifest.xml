@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.android.apsschool.user">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.GET_TASKS"/>
 
     <application
         android:allowBackup="true"
@@ -13,61 +13,50 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
 
-        <meta-data
-            android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713" />
-
         <activity android:name="com.android.apsschool.welcome.BlankWelcomeScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity android:name="com.android.apsschool.welcome.SchoolWelcomeScreen">
             <intent-filter>
                 <action android:name="com.android.apsschool.welcome.SchoolWelcomeScreen" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
         <activity android:name="com.android.apsschool.home.SelectCourse">
             <intent-filter>
                 <action android:name="com.android.apsschool.home.SelectCourse" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
-        <activity android:name="com.android.apsschool.user.UserLogin">
+        <activity android:name=".UserLogin">
             <intent-filter>
                 <action android:name="com.android.apsschool.user.UserLogin" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
         <activity android:name="com.android.apsschool.home.SelectSubject">
             <intent-filter>
                 <action android:name="com.android.apsschool.home.SelectSubject" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
         <activity
             android:name="com.android.apsschool.home.MainActivity"
             android:configChanges="orientation|screenSize">
             <intent-filter>
                 <action android:name="com.android.apsschool.home.MainActivity" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
-        <receiver android:name="com.android.apsschool.uninstall.UninstallIntentReceiver">
-            <intent-filter android:priority="0">
-                <action android:name="android.intent.action.QUERY_PACKAGE_RESTART" />
-                <data android:scheme="package" />
-            </intent-filter>
-        </receiver>
-
     </application>
 
 </manifest>

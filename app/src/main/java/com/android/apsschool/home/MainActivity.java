@@ -50,31 +50,6 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
-//        FirebaseFirestore db = StaticUtilities.DB;
-//
-//        db.collection("courses").whereEqualTo("CLASS", "12")
-//                .get()
-//                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                        if (task.isSuccessful()) {
-//                            for (QueryDocumentSnapshot document : task.getResult()) {
-//                                Log.d("MainActivity", document.getId() + " => " + document.getData());
-//                            }
-//                            List<Course> courses = task.getResult().toObjects(Course.class);
-//                            for (Course course:courses) {
-//                                Log.d("MainActivity", "onComplete: "+course.VIDEO_NAME);
-//                                Date today = new Date();
-//                                SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy;hh:mm");
-//                                String dateToStr = format.format(today);
-//                                System.out.println("Date in String : "+dateToStr);
-//                            }
-//                        } else {
-//                            Log.w("MainActivity", "Error getting documents.", task.getException());
-//                        }
-//                    }
-//                });
-
         isPlaying = false;
         ll = findViewById(R.id.linearLayout);
         mainVideoView = findViewById(R.id.videoView);
