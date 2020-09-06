@@ -68,6 +68,7 @@ public class SchoolWelcomeScreen extends AppCompatActivity {
                                     }else{
                                         Toast toast = Toast.makeText(getApplicationContext(), "You are restricted from login permissions. Please contact school admin...", Toast.LENGTH_LONG);
                                         toast.show();
+                                        divertToUserLogin();
                                     }
                                 } else {
                                     Log.d("SchoolWelcomeScreen", "onCreate: Diverted to Login Page : 2");
