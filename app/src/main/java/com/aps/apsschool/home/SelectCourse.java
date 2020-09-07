@@ -18,6 +18,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.aps.apsschool.beans.Course;
+import com.aps.apsschool.beans.Student;
 import com.aps.apsschool.database.DBActivities;
 import com.aps.apsschool.staticutilities.StaticUtilities;
 import com.aps.apsschool.user.R;
@@ -54,6 +55,24 @@ public class SelectCourse extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_course);
         ctx = this;
+        db.collection("students").whereEqualTo("ROLLNUMBER", (new DBActivities(getApplicationContext()).getStudentRollNo()))
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            if(task.isSuccessful() && !task.getResult().isEmpty()) {
+                                List<Student> students = task.getResult().toObjects(Student.class);
+                                if(students.get(0).PERMISSION==false) {
+                                    updateLoginFlag();
+                                    Intent i = new Intent(SelectCourse.this, UserLogin.class);
+                                    startActivity(i);
+                                    finish();
+                                }
+                            }
+                        }
+                    }
+                });
         logOut = findViewById(R.id.log_out);
         subject_id = findViewById(R.id.subject_id);
         subject_id.setText(SelectSubject.SUBJECT_SELECTED);
@@ -231,6 +250,9 @@ public class SelectCourse extends AppCompatActivity {
         DBActivities dbActivities = new DBActivities(getApplicationContext());
         dbActivities.deleteSubjectTable(ctx);
         dbActivities.deleteStudentTable(ctx);
+        Intent i = new Intent(this, UserLogin.class);
+        startActivity(i);
+        finish();
     }
 
     private void updateLoginFlag() {
@@ -257,8 +279,5 @@ public class SelectCourse extends AppCompatActivity {
                         }
                     }
                 });
-        Intent i = new Intent(this, UserLogin.class);
-        startActivity(i);
-        finish();
     }
 }

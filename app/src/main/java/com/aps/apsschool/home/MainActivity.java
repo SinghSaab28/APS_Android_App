@@ -4,23 +4,38 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.media.MediaPlayer;
+import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.aps.apsschool.beans.Student;
 import com.aps.apsschool.database.DBActivities;
+import com.aps.apsschool.staticutilities.StaticUtilities;
 import com.aps.apsschool.user.R;
+import com.aps.apsschool.user.UserLogin;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -42,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView backwardBtn;
     private ConstraintLayout videoLayout;
     private int toolsVisibilitytime = 5000;
+    final FirebaseFirestore db = StaticUtilities.DB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +65,33 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
+        db.collection("students").whereEqualTo("ROLLNUMBER", (new DBActivities(getApplicationContext()).getStudentRollNo()))
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            if(task.isSuccessful() && !task.getResult().isEmpty()) {
+                                List<Student> students = task.getResult().toObjects(Student.class);
+                                if(students.get(0).PERMISSION==false) {
+                                    updateLoginFlag();
+                                    Intent i = new Intent(getApplicationContext(), UserLogin.class);
+                                    startActivity(i);
+                                    finish();
+                                }
+                            }
+                        }
+                    }
+                });
+
+        final Handler hMic = new Handler();
+        hMic.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                checkMic();
+            }
+        }, 10000);
 
         isPlaying = false;
         ll = findViewById(R.id.linearLayout);
@@ -186,6 +229,36 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void checkMic() {
+        boolean isMicFree = true;
+        MediaRecorder recorder = new MediaRecorder();
+        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+        recorder.setOutputFile("/dev/null");
+        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+        try {
+            recorder.start();
+        } catch (IllegalStateException e) {
+            Log.e("MediaRecorder", "start() failed: MIC is busy");
+            Intent i = new Intent(this, SelectCourse.class);
+            startActivity(i);
+            finish();
+            isMicFree = false;
+        }
+        if (isMicFree) {
+            Log.e("MediaRecorder", "start() successful: MIC is free");
+        }
+        recorder.stop();
+        recorder.release();
+        Handler hMic = new Handler();
+        hMic.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                checkMic();
+            }
+        }, 120000);
+    }
+
     public class VideoProgress extends AsyncTask<Void, Integer, Void> {
 
         @Override
@@ -259,5 +332,31 @@ public class MainActivity extends AppCompatActivity {
         Intent i = new Intent(this, SelectCourse.class);
         startActivity(i);
         finish();
+    }
+
+    private void updateLoginFlag() {
+        db.collection("students").whereEqualTo("ROLLNUMBER", (new DBActivities(getApplicationContext())).getStudentRollNo())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            if(task.getResult().size()==1) {
+                                System.out.println("jagga");
+                                for (DocumentSnapshot document : task.getResult()) {
+                                    String id = document.getId();
+                                    db.collection("students").document(id).update("LOGIN_FLAG", false) //Set student object
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Toast.makeText(MainActivity.this, "Updated Successfully", Toast.LENGTH_SHORT).show();
+                                                    Log.d("SelectCourse", "updateLoginFlag : LOGIN_FLAG updated to false.");
+                                                }
+                                            });
+                                }
+                            }
+                        }
+                    }
+                });
     }
 }

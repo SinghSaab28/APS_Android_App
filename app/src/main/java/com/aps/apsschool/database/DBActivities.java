@@ -102,6 +102,8 @@ public class DBActivities extends AppCompatActivity {
         // Gets the data repository in write mode
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
+        db.delete(StudentContract.StudentEntry.TABLE_NAME, null, null);
+
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
         values.put(StudentContract.StudentEntry.COLUMN_NAME_ROLL_NO, student.ROLLNUMBER);
@@ -190,6 +192,7 @@ public class DBActivities extends AppCompatActivity {
     public void deleteStudentTable(Context ctx){
         StudentDbHelper dbHelper = new StudentDbHelper(this.context);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
+        db.delete(StudentContract.StudentEntry.TABLE_NAME, null, null);
         dbHelper.onDowngrade(db,0,0);
     }
 

@@ -20,6 +20,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.aps.apsschool.beans.Division;
+import com.aps.apsschool.beans.Student;
 import com.aps.apsschool.database.DBActivities;
 import com.aps.apsschool.staticutilities.StaticUtilities;
 import com.aps.apsschool.user.R;
@@ -52,6 +53,24 @@ public class SelectSubject extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_subject);
         ctx = this;
+        db.collection("students").whereEqualTo("ROLLNUMBER", (new DBActivities(getApplicationContext()).getStudentRollNo()))
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            if(task.isSuccessful() && !task.getResult().isEmpty()) {
+                                List<Student> students = task.getResult().toObjects(Student.class);
+                                if(students.get(0).PERMISSION==false) {
+                                    updateLoginFlag();
+                                    Intent i = new Intent(SelectSubject.this, UserLogin.class);
+                                    startActivity(i);
+                                    finish();
+                                }
+                            }
+                        }
+                    }
+                });
         logOut = findViewById(R.id.log_out);
         pb = findViewById(R.id.progressBar);
         pb.setVisibility(View.VISIBLE);
@@ -164,6 +183,9 @@ public class SelectSubject extends AppCompatActivity {
         DBActivities dbActivities = new DBActivities(getApplicationContext());
         dbActivities.deleteSubjectTable(ctx);
         dbActivities.deleteStudentTable(ctx);
+        Intent i = new Intent(this, UserLogin.class);
+        startActivity(i);
+        finish();
     }
 
     private void confirmationAlert(){
@@ -213,8 +235,5 @@ public class SelectSubject extends AppCompatActivity {
                         }
                     }
                 });
-        Intent i = new Intent(this, UserLogin.class);
-        startActivity(i);
-        finish();
     }
 }
