@@ -4,9 +4,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.media.MediaPlayer;
-import android.media.MediaRecorder;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -47,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar currentProgress;
     private ProgressBar bufferProgress;
     private Boolean isPlaying;
-    private VideoProgress videoProgress;
     private Uri videoUri;
     private int current = 0;
     private int seekVideo = 10000;
@@ -58,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     private ConstraintLayout videoLayout;
     private int toolsVisibilitytime = 5000;
     final FirebaseFirestore db = StaticUtilities.DB;
+    private Handler videoProgressHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,14 +82,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
-
-        final Handler hMic = new Handler();
-        hMic.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                checkMic();
-            }
-        }, 10000);
 
         isPlaying = false;
         ll = findViewById(R.id.linearLayout);
@@ -120,12 +110,13 @@ public class MainActivity extends AppCompatActivity {
         mainVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {
-                mainVideoView.start();
                 duration = mediaPlayer.getDuration()/1000;
                 String durationString = String.format("%2d:%02d:%02d",duration/(60*60), (duration/60)%60, duration%60);
                 durationTimer.setText(durationString);
             }
         });
+
+        mainVideoView.start();
 
         mainVideoView.setOnInfoListener(new MediaPlayer.OnInfoListener() {
             @Override
@@ -152,9 +143,6 @@ public class MainActivity extends AppCompatActivity {
                 backwardBtn.setVisibility(View.GONE);
             }
         }, toolsVisibilitytime);
-
-        videoProgress = new VideoProgress();
-        videoProgress.execute();
 
         playBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -193,14 +181,20 @@ public class MainActivity extends AppCompatActivity {
         forwardBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mainVideoView.seekTo(mainVideoView.getCurrentPosition()+seekVideo);
+                if(mainVideoView.getCurrentPosition()+seekVideo < mainVideoView.getDuration()) {
+                    checkVideoProgress();
+                    mainVideoView.seekTo(mainVideoView.getCurrentPosition() + seekVideo);
+                }
             }
         });
 
         backwardBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mainVideoView.seekTo(mainVideoView.getCurrentPosition()-seekVideo);
+                if(mainVideoView.getCurrentPosition()-seekVideo > 0) {
+                    checkVideoProgress();
+                    mainVideoView.seekTo(mainVideoView.getCurrentPosition() - seekVideo);
+                }
             }
         });
 
@@ -226,86 +220,53 @@ public class MainActivity extends AppCompatActivity {
         if(courseProgress!=null) {
             mainVideoView.seekTo(Integer.parseInt(courseProgress));
         }
-
-    }
-
-    private void checkMic() {
-        boolean isMicFree = true;
-        MediaRecorder recorder = new MediaRecorder();
-        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-        recorder.setOutputFile("/dev/null");
-        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
-        try {
-            recorder.start();
-        } catch (IllegalStateException e) {
-            Log.e("MediaRecorder", "start() failed: MIC is busy");
-            Intent i = new Intent(this, SelectCourse.class);
-            startActivity(i);
-            finish();
-            isMicFree = false;
-        }
-        if (isMicFree) {
-            Log.e("MediaRecorder", "start() successful: MIC is free");
-        }
-        recorder.stop();
-        recorder.release();
-        Handler hMic = new Handler();
-        hMic.postDelayed(new Runnable() {
+        videoProgressHandler = new Handler();
+        videoProgressHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                checkMic();
+                checkVideoProgress();
             }
-        }, 120000);
+        }, 1000);
+
     }
 
-    public class VideoProgress extends AsyncTask<Void, Integer, Void> {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-        try {
-            do {
-                if (isPlaying) {
-//                    bufferProgress.setVisibility(View.GONE);
-                    current = mainVideoView.getCurrentPosition() / 1000;
+    private void checkVideoProgress() {
+        int currentPercent = 0;
+        try{
+            if (isPlaying && currentProgress.getProgress() <= 100) {
+                current = mainVideoView.getCurrentPosition() / 1000;
+                try {
+                    currentPercent = current * 100 / duration;
+                } catch (Exception e) {
+                }
+                if(currentPercent>0) {
                     try {
-                        int currentPercent = current * 100 / duration;
-                        publishProgress(currentPercent);
+                        currentProgress.setProgress(currentPercent);
+                        String currentString = "0:00";
+                        if (current / (60 * 60) != 0) {
+                            currentString = String.format("%2d:%02d:%02d", current / (60 * 60), (current / 60) % 60, current % 60);
+                        } else {
+                            currentString = String.format("%02d:%02d", current / 60, current % 60);
+                        }
+                        currentTimer.setText(currentString);
                     } catch (Exception e) {
-
                     }
                 }
-            } while (currentProgress.getProgress() <= 100);
-        }catch(IllegalStateException e){
-
-        }
-
-            return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-            try {
-                currentProgress.setProgress(values[0]);
-                String currentString = "0:00";
-                if(current/(60*60)!=0){
-                    currentString = String.format("%2d:%02d:%02d",current/(60*60), (current/60)%60, current%60);
-                }else{
-                    currentString = String.format("%02d:%02d",current/60, current%60);
-                }
-                currentTimer.setText(currentString);
-            } catch (Exception e){
-
             }
+        }catch(Exception e){
         }
+        videoProgressHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                checkVideoProgress();
+            }
+        }, 1000);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         isPlaying = false;
-        videoProgress.cancel(true);
         mainVideoView.stopPlayback();
     }
 
@@ -313,8 +274,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         isPlaying = true;
-        videoProgress = new VideoProgress();
-        videoProgress.execute();
     }
 
     @Override
@@ -325,9 +284,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        videoProgressHandler.removeCallbacksAndMessages(null);
         DBActivities dbActivities = new DBActivities(getApplicationContext());
-        dbActivities.setCoursesProgress(getApplicationContext(), SelectCourse.VIDEO_SELECTED, mainVideoView.getCurrentPosition());
-        videoProgress.cancel(true);
+        if(mainVideoView.getCurrentPosition() > (mainVideoView.getDuration()-2*1000)){
+            dbActivities.setCoursesProgress(getApplicationContext(), SelectCourse.VIDEO_SELECTED, 0);
+        }else {
+            dbActivities.setCoursesProgress(getApplicationContext(), SelectCourse.VIDEO_SELECTED, mainVideoView.getCurrentPosition());
+        }
         mainVideoView.stopPlayback();
         Intent i = new Intent(this, SelectCourse.class);
         startActivity(i);

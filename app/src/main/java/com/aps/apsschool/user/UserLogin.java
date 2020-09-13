@@ -54,7 +54,6 @@ public class UserLogin extends AppCompatActivity {
                                 if (students.get(0).LOGIN_FLAG == false) {
                                     if (password.getText().toString().equals(students.get(0).PASSWORD)) {
                                         updateLoginFlag();
-                                        Log.d("UserLogin", "onComplete: " + students.get(0).NAME);
                                         if (!dbActivities.verifyStudent(rollno.getText().toString())) {
                                             dbActivities.addStudent(getApplicationContext(), students.get(0));
                                         }
@@ -62,7 +61,6 @@ public class UserLogin extends AppCompatActivity {
                                         startActivity(i);
                                         finish();
                                     } else {
-                                        Log.d("UserLogin", "login : Password is incorrect for : " + students.get(0).ROLLNUMBER);
                                         Toast toast = Toast.makeText(getApplicationContext(), "Roll number or Password incorrect. Please try again with correct credentials...", Toast.LENGTH_LONG);
                                         toast.show();
                                     }
@@ -76,7 +74,6 @@ public class UserLogin extends AppCompatActivity {
                             }
                         } else {
                             Log.w("UserLogin", "Error getting documents.", task.getException());
-                            Log.d("UserLogin", "login : Roll number is incorrect.");
                             Toast toast = Toast.makeText(getApplicationContext(), "Roll number or Password incorrect. Please try again with correct credentials...", Toast.LENGTH_LONG);
                             toast.show();
                         }
@@ -92,15 +89,13 @@ public class UserLogin extends AppCompatActivity {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     if(task.getResult().size()==1) {
-                        System.out.println("jagga");
                         for (DocumentSnapshot document : task.getResult()) {
                             String id = document.getId();
                             db.collection("students").document(id).update("LOGIN_FLAG", true) //Set student object
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
-                                            Toast.makeText(UserLogin.this, "Updated Successfully", Toast.LENGTH_SHORT).show();
-                                            Log.d("UserLogin", "updateLoginFlag : LOGIN_FLAG updated to true.");
+                                            Toast.makeText(UserLogin.this, "Logged in successfully", Toast.LENGTH_SHORT).show();
                                         }
                                     });
                         }

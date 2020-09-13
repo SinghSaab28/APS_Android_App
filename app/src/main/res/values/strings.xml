@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">APS_School</string>
-    <string name="ad_attribution">Ad</string>
-    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="app_name">APS School</string>
+    <string name="default_notification_channel_id">Testing</string>
+    <string name="fcm_message">FCM  Message</string>
 </resources>

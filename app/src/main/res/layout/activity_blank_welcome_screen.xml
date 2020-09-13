@@ -6,6 +6,6 @@
     android:layout_height="match_parent"
     android:background="@mipmap/school_full_logo_foreground"
     android:alpha="0.5"
-    tools:context="com.android.apsschool.welcome.BlankWelcomeScreen">
+    tools:context="com.aps.apsschool.welcome.BlankWelcomeScreen">
 
 </androidx.constraintlayout.widget.ConstraintLayout>

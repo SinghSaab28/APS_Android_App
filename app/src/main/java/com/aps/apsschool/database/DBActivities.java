@@ -4,9 +4,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.aps.apsschool.beans.Student;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,30 +24,13 @@ public class DBActivities extends AppCompatActivity {
         Cursor cursor = getStudentDBCursor();
         while(cursor.moveToNext()) {
             if(cursor.getString(0).equalsIgnoreCase("") || cursor.getString(0)==null){
-                Log.d("DBActivities","verifyStudent : Student does not exists");
                 return false;
             }
-            Log.d("DBActivities","verifyStudent : Student already exists : "+cursor.getString(0));
             return true;
         }
         cursor.close();
         return false;
     }
-
-//    public String getFirstName(){
-//        String firstName = null;
-//        Cursor cursor = getCursor();
-//        while(cursor.moveToNext()) {
-//            if(cursor.getString(1).equalsIgnoreCase("") || cursor.getString(1)==null){
-//                break;
-//            }
-//            Log.d("DBActivities","getFirstName : First Name : "+cursor.getString(1));
-//            firstName=cursor.getString(1).split(" ")[0];
-//
-//        }
-//        cursor.close();
-//        return firstName;
-//    }
 
     private Cursor getStudentDBCursor(){
         StudentDbHelper dbHelper = new StudentDbHelper(this.context);
@@ -140,7 +125,6 @@ public class DBActivities extends AppCompatActivity {
             if(cursor.getString(0).equalsIgnoreCase("") || cursor.getString(0)==null){
                 break;
             }
-            Log.d("DBActivities","getSubjectList : Subject : "+cursor.getString(0));
             subjects.add(cursor.getString(0));
         }
         cursor.close();
@@ -154,7 +138,6 @@ public class DBActivities extends AppCompatActivity {
             if(cursor.getString(3).equalsIgnoreCase("") || cursor.getString(3)==null){
                 break;
             }
-            Log.d("DBActivities","getStudentClass : Class : "+cursor.getString(3));
             division=cursor.getString(3);
         }
         cursor.close();
@@ -168,7 +151,6 @@ public class DBActivities extends AppCompatActivity {
             if(cursor.getString(2)==null || cursor.getString(2).equalsIgnoreCase("")){
                 break;
             }
-            Log.d("DBActivities","getStudentClass : Class : "+cursor.getString(2));
             medium=cursor.getString(2);
         }
         cursor.close();
@@ -182,7 +164,6 @@ public class DBActivities extends AppCompatActivity {
             if(cursor.getString(0)==null || cursor.getString(0).equalsIgnoreCase("")){
                 break;
             }
-            Log.d("DBActivities","getStudentRollNo : Roll Number : "+cursor.getString(0));
             rollNo=cursor.getString(0);
         }
         cursor.close();

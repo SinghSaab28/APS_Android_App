@@ -9,7 +9,6 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -23,6 +22,7 @@ import com.aps.apsschool.beans.Division;
 import com.aps.apsschool.beans.Student;
 import com.aps.apsschool.database.DBActivities;
 import com.aps.apsschool.staticutilities.StaticUtilities;
+import com.aps.apsschool.user.Blank;
 import com.aps.apsschool.user.R;
 import com.aps.apsschool.user.UserLogin;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -39,7 +39,6 @@ import java.util.List;
 public class SelectSubject extends AppCompatActivity {
 
     private Button newBtn;
-    private FrameLayout fl;
     public static String SUBJECT_SELECTED = "";
     private List<String> arr = new ArrayList<>();
     private TextView class_id;
@@ -77,10 +76,8 @@ public class SelectSubject extends AppCompatActivity {
         DBActivities dbActivities = new DBActivities(getApplicationContext());
         List<String> subjectList = dbActivities.getSubjectList();
         if(subjectList.size()>0){
-            System.out.println("if me andr aaya");
             arr = subjectList;
         }else {
-            System.out.println("else me andr aaya");
             db.collection("class")
                     .whereEqualTo("CLASS", dbActivities.getStudentClass())
                     .get()
@@ -88,7 +85,6 @@ public class SelectSubject extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<QuerySnapshot> task) {
                             if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                                System.out.println("Firestore DB if me aaya");
                                 for (QueryDocumentSnapshot document : task.getResult()) {
                                     Log.d("SelectSubject", document.getId() + " => " + document.getData());
                                 }
@@ -97,23 +93,28 @@ public class SelectSubject extends AppCompatActivity {
                                 DBActivities dbActivities = new DBActivities(getApplicationContext());
                                 dbActivities.addSubjects(getApplicationContext(), arr);
                             } else {
-                                System.out.println("Firestore DB else me aaya");
                                 Log.w("SelectSubject", "Error getting documents.", task.getException());
                             }
                         }
                     });
         }
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("array Size : "+arr.size());
-                pb.setVisibility(View.GONE);
-                for (int i = 0; i < arr.size(); i++) {
-                    createNewButton(i, arr.get(i), arr.size()-1);
-                }
+        if(subjectList.size()>0){
+            pb.setVisibility(View.GONE);
+            for (int i = 0; i < arr.size(); i++) {
+                createNewButton(i, arr.get(i), arr.size()-1);
             }
-        }, 2000);
+        }else {
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    pb.setVisibility(View.GONE);
+                    for (int i = 0; i < arr.size(); i++) {
+                        createNewButton(i, arr.get(i), arr.size() - 1);
+                    }
+                }
+            }, 2000);
+        }
 
         class_id = findViewById(R.id.class_id);
         class_id.setText("Class : "+dbActivities.getStudentClass());
@@ -175,7 +176,13 @@ public class SelectSubject extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        confirmationAlert();
+        Intent launchNextActivity;
+        launchNextActivity = new Intent(this, Blank.class);
+//        launchNextActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        launchNextActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//        launchNextActivity.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(launchNextActivity);
+        finish();
     }
 
     private void deleteDBTables(Context ctx){
@@ -189,14 +196,13 @@ public class SelectSubject extends AppCompatActivity {
     }
 
     private void confirmationAlert(){
-
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE:
                         //Yes button clicked
-                        deleteDBTables(ctx);
+//                        deleteDBTables(ctx);
                         break;
 
                     case DialogInterface.BUTTON_NEGATIVE:
@@ -211,7 +217,6 @@ public class SelectSubject extends AppCompatActivity {
     }
 
     private void updateLoginFlag() {
-        System.out.println("updateLoginFlag me aaya");
         db.collection("students").whereEqualTo("ROLLNUMBER", (new DBActivities(getApplicationContext())).getStudentRollNo())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -226,8 +231,7 @@ public class SelectSubject extends AppCompatActivity {
                                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
-                                                    Toast.makeText(SelectSubject.this, "Updated Successfully", Toast.LENGTH_SHORT).show();
-                                                    Log.d("SelectSubject", "updateLoginFlag : LOGIN_FLAG updated to false.");
+                                                    Toast.makeText(SelectSubject.this, "Logged out successfully", Toast.LENGTH_SHORT).show();
                                                 }
                                             });
                                 }

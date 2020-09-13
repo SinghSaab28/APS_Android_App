@@ -10,6 +10,7 @@ public class Student {
     public Boolean LOGIN_FLAG;
     public Boolean PERMISSION;
     public String IMEI;
+    public String CONTACTNUMBER;
 
     public Student() {};
 

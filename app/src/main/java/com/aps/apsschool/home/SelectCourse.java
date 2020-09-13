@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,7 +41,7 @@ import java.util.concurrent.TimeUnit;
 
 public class SelectCourse extends AppCompatActivity {
 
-    private static List<Course> COURSES = new ArrayList<>();
+    private static List<Course> COURSES;
     final FirebaseFirestore db = StaticUtilities.DB;
     public static String VIDEO_SELECTED = "";
     public static Boolean SELECTED_VIDEO_AVAILABILITY = false;
@@ -49,12 +50,24 @@ public class SelectCourse extends AppCompatActivity {
     private Context ctx;
     private TextView subject_id;
     private TextView noCourse;
+    private CountDownTimer cdt;
+    private Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_course);
         ctx = this;
+
+        COURSES = new ArrayList<>();
+
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                checkAvailabilityTime();
+            }
+        }, 1000);
         db.collection("students").whereEqualTo("ROLLNUMBER", (new DBActivities(getApplicationContext()).getStudentRollNo()))
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -84,6 +97,7 @@ public class SelectCourse extends AppCompatActivity {
                 .whereEqualTo("CLASS",dbActivities.getStudentClass())
                 .whereEqualTo("SUBJECT", SelectSubject.SUBJECT_SELECTED)
                 .whereEqualTo("MEDIUM", dbActivities.getStudentMedium())
+                .orderBy("DATE_TIME_OF_AVAILABILITY")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -102,7 +116,7 @@ public class SelectCourse extends AppCompatActivity {
                                     if(course.DATE_TIME_OF_AVAILABILITY.compareTo(new Date())<=0) {
                                         noCourse.setVisibility(View.GONE);
                                         COURSES.add(course);
-                                        createNewButton(course);
+                                        createNewButton(i, course);
                                     }
                                 }
                             }
@@ -139,14 +153,78 @@ public class SelectCourse extends AppCompatActivity {
         });
     }
 
+    private void checkAvailabilityTime() {
+        ViewGroup container = (ViewGroup)findViewById(R.id.rootCourseLayout);
+        if(container.getChildCount()>0) {
+            for (int i = 0; i < container.getChildCount(); i++) {
+                View child = container.getChildAt(i);
+                TextView cDT = child.findViewById(R.id.countDownTimer);
+                Course course = COURSES.get(i);
+                Calendar start_calendar = Calendar.getInstance();
+                Calendar end_calendar;
+
+                // convert date to calendar
+                Calendar c = Calendar.getInstance();
+                c.setTime(course.DATE_TIME_OF_AVAILABILITY);
+
+                // manipulate date
+                c.add(Calendar.DATE, 2); //same with c.add(Calendar.DAY_OF_MONTH, 1);
+
+                // convert calendar to date
+                end_calendar = c;
+                long start_millis = start_calendar.getTimeInMillis(); //get the start time in milliseconds
+                long end_millis = end_calendar.getTimeInMillis(); //get the end time in milliseconds
+                long total_millis = (end_millis - start_millis); //total time in milliseconds
+                cdt = new CountDownTimer(total_millis, 1000) {
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+                        long days = TimeUnit.MILLISECONDS.toDays(millisUntilFinished);
+                        millisUntilFinished -= TimeUnit.DAYS.toMillis(days);
+
+                        long hours = TimeUnit.MILLISECONDS.toHours(millisUntilFinished);
+                        millisUntilFinished -= TimeUnit.HOURS.toMillis(hours);
+
+                        long minutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished);
+                        millisUntilFinished -= TimeUnit.MINUTES.toMillis(minutes);
+
+                        long seconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished);
+                        if (days > 0) {
+                            cDT.setText("Expires in : " + days + "Days " + hours + "Hrs");
+                            cDT.setTextColor(Color.parseColor("#00FF00"));
+                        } else if (hours > 0) {
+                            cDT.setText("Expires in : " + hours + "Hrs " + minutes + "Mins");
+                            cDT.setTextColor(Color.parseColor("#FF7F50"));
+                        } else if (minutes > 0) {
+                            cDT.setText("Expires in : " + minutes + "Mins " + seconds + "Secs");
+                        }
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        countDownTimer.setText("Course Expired!");
+                    }
+                };
+                cdt.start();
+            }
+        }
+        handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                checkAvailabilityTime();
+            }
+        }, 1000);
+    }
+
     private void createNewTextField() {
         TextView tv = findViewById(R.id.noCourse);
         tv.setVisibility(View.VISIBLE);
     }
 
-    private void createNewButton(final Course course) {
+    private void createNewButton(int i, final Course course) {
         ViewGroup container = (ViewGroup)findViewById(R.id.rootCourseLayout);
         final View myLayout = getLayoutInflater().inflate(R.layout.course_view, null);
+        myLayout.setId(i);
         countDownTimer = myLayout.findViewById(R.id.countDownTimer);
         TextView chapter_name = myLayout.findViewById(R.id.chapter_name);
         chapter_name.setText("Title : "+course.TITLE);
@@ -163,57 +241,10 @@ public class SelectCourse extends AppCompatActivity {
         postedBy.setTextColor(Color.parseColor("#ffffff"));
         postedBy.setTextSize(15);
 
-        Date availabilityDate = course.DATE_TIME_OF_AVAILABILITY;
-        Calendar start_calendar = Calendar.getInstance();
-        Calendar end_calendar;
-
-        // convert date to calendar
-        Calendar c = Calendar.getInstance();
-        c.setTime(availabilityDate);
-
-        // manipulate date
-        c.add(Calendar.DATE, 2); //same with c.add(Calendar.DAY_OF_MONTH, 1);
-
-        // convert calendar to date
-        end_calendar = c;
-        Date currentDatePlusTwo = c.getTime();
-        System.out.println("Date & Time Plus 2 days : "+currentDatePlusTwo);
-        long start_millis = start_calendar.getTimeInMillis(); //get the start time in milliseconds
-        long end_millis = end_calendar.getTimeInMillis(); //get the end time in milliseconds
-        long total_millis = (end_millis - start_millis); //total time in milliseconds
-        CountDownTimer cdt = new CountDownTimer(total_millis, 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                long days = TimeUnit.MILLISECONDS.toDays(millisUntilFinished);
-                millisUntilFinished -= TimeUnit.DAYS.toMillis(days);
-
-                long hours = TimeUnit.MILLISECONDS.toHours(millisUntilFinished);
-                millisUntilFinished -= TimeUnit.HOURS.toMillis(hours);
-
-                long minutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished);
-                millisUntilFinished -= TimeUnit.MINUTES.toMillis(minutes);
-
-                long seconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished);
-                if(days>0){
-                    countDownTimer.setText("Expires in : "+ days + "Days " + hours + "Hrs");
-                    countDownTimer.setTextColor(Color.parseColor("#00FF00"));
-                } else if(hours>0){
-                    countDownTimer.setText("Expires in : "+ hours + "Hrs " + minutes + "Mins");
-                    countDownTimer.setTextColor(Color.parseColor("#FF7F50"));
-                } else if (minutes>0){
-                    countDownTimer.setText("Expires in : "+ minutes + "Mins " + seconds + "Secs");
-                }
-            }
-
-            @Override
-            public void onFinish() {
-                countDownTimer.setText("Course Expired!");
-            }
-        };
-        cdt.start();
         myLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                handler.removeCallbacksAndMessages(null);
                 onCourseClick(course);
                 System.out.println("Course URL : "+course.VIDEO_NAME);
             }
@@ -240,6 +271,9 @@ public class SelectCourse extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        if(handler!=null) {
+            handler.removeCallbacksAndMessages(null);
+        }
         Intent i = new Intent(this, SelectSubject.class);
         startActivity(i);
         finish();

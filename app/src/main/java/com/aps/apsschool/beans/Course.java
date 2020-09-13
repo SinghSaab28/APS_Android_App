@@ -12,6 +12,9 @@ public class Course {
     public String TITLE;
     public String CHAPTER_DESCRIPTION;
     public String POSTED_BY;
+    public String OWNER;
+    public Date CREATED_AT;
+    public String WATCHED_BY;
 
     Course() {};
 

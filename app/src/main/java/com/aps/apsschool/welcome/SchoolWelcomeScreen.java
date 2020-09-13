@@ -3,7 +3,6 @@ package com.aps.apsschool.welcome;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -55,14 +54,11 @@ public class SchoolWelcomeScreen extends AppCompatActivity {
                                     List<Student> students = task.getResult().toObjects(Student.class);
                                     STUDENT = students.get(0);
                                     if(STUDENT.PERMISSION==true) {
-                                        Log.d("SchoolWelcomeScreen", "onCreate: Student permission = true");
                                         if(STUDENT.LOGIN_FLAG==true){
-                                            Log.d("SchoolWelcomeScreen", "onCreate: Student login flag = true");
                                                 Intent i = new Intent(getApplicationContext(), SelectSubject.class);
                                                 startActivity(i);
                                                 finish();
                                         } else {
-                                            Log.d("SchoolWelcomeScreen", "onCreate: Diverted to Login Page : 1");
                                             divertToUserLogin();
                                         }
                                     }else{
@@ -71,17 +67,14 @@ public class SchoolWelcomeScreen extends AppCompatActivity {
                                         divertToUserLogin();
                                     }
                                 } else {
-                                    Log.d("SchoolWelcomeScreen", "onCreate: Diverted to Login Page : 2");
                                     divertToUserLogin();
                                 }
                             }
                         });
             } else {
-                Log.d("SchoolWelcomeScreen", "onCreate: Diverted to Login Page : 3");
                 divertToUserLogin();
             }
         } catch (Exception e){
-            Log.d("SchoolWelcomeScreen", "onCreate: Diverted to Login Page : 4");
             divertToUserLogin();
         }
     }
