@@ -8,6 +8,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.aps.apsschool.Dashboard;
 import com.aps.apsschool.beans.Student;
 import com.aps.apsschool.database.DBActivities;
 import com.aps.apsschool.home.SelectSubject;
@@ -16,6 +17,8 @@ import com.aps.apsschool.user.R;
 import com.aps.apsschool.user.UserLogin;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -24,22 +27,36 @@ import java.util.List;
 public class SchoolWelcomeScreen extends AppCompatActivity {
 
     private  static Student STUDENT = null;
+    private FirebaseAuth mAuth;
+    private DBActivities dbActivities = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_school_welcome_screen);
+        dbActivities = new DBActivities(getApplicationContext());
+        mAuth = StaticUtilities.mAuth;
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                checkUserInLocalDB();
+                FirebaseUser currentUser = mAuth.getCurrentUser();
+                if(currentUser!=null && currentUser.getUid()!=null) {
+                    Intent i = new Intent(getApplicationContext(), Dashboard.class);
+                    startActivity(i);
+                    finish();
+                }else if((currentUser==null || currentUser.getUid()==null) && (dbActivities.getStudentRollNo()==null || dbActivities.getStudentRollNo().equalsIgnoreCase(""))){
+                    Intent i = new Intent(getApplicationContext(), TeacherOrStudent.class);
+                    startActivity(i);
+                    finish();
+                }else {
+                    checkUserInLocalDB();
+                }
             }
         }, 2000);
     }
 
     private void checkUserInLocalDB(){
-        DBActivities dbActivities = new DBActivities(getApplicationContext());
         try {
             if (dbActivities.getStudentRollNo() != null &&
                     !dbActivities.getStudentRollNo().equalsIgnoreCase("") &&

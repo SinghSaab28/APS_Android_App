@@ -190,6 +190,7 @@ public class SelectSubject extends AppCompatActivity {
         DBActivities dbActivities = new DBActivities(getApplicationContext());
         dbActivities.deleteSubjectTable(ctx);
         dbActivities.deleteStudentTable(ctx);
+        dbActivities.deleteCourseTable(ctx);
         Intent i = new Intent(this, UserLogin.class);
         startActivity(i);
         finish();

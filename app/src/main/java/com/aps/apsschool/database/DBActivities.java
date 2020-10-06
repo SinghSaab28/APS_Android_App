@@ -183,6 +183,12 @@ public class DBActivities extends AppCompatActivity {
         dbHelper.onDowngrade(db,0,0);
     }
 
+    public void deleteCourseTable(Context ctx){
+        CourseDbHelper dbHelper = new CourseDbHelper(this.context);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        dbHelper.onDowngrade(db,0,0);
+    }
+
     public void setCoursesProgress(Context context, String courseURI, int currentPosition) {
         CourseDbHelper dbHelper = new CourseDbHelper(context);
 

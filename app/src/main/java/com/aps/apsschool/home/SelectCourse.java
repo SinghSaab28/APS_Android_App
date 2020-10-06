@@ -260,7 +260,7 @@ public class SelectCourse extends AppCompatActivity {
         SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd yyyy HH:mm:ss zzzz");
         if(currentDateTime.compareTo(availabilityDate) >= 0) {
             SELECTED_VIDEO_AVAILABILITY=true;
-            Intent i = new Intent(getApplicationContext(), MainActivity.class);
+            Intent i = new Intent(getApplicationContext(), PlayerActivity.class);
             startActivity(i);
         }else{
             Toast toast = Toast.makeText(getApplicationContext(), "This video is unavailable right now. Please try opening once it is available...", Toast.LENGTH_LONG);
@@ -284,6 +284,7 @@ public class SelectCourse extends AppCompatActivity {
         DBActivities dbActivities = new DBActivities(getApplicationContext());
         dbActivities.deleteSubjectTable(ctx);
         dbActivities.deleteStudentTable(ctx);
+        dbActivities.deleteCourseTable(ctx);
         Intent i = new Intent(this, UserLogin.class);
         startActivity(i);
         finish();

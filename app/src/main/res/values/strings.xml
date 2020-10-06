@@ -2,4 +2,8 @@
     <string name="app_name">APS School</string>
     <string name="default_notification_channel_id">Testing</string>
     <string name="fcm_message">FCM  Message</string>
+    <string name="select_file">Select video</string>
+    <string name="compress_video">Compress video</string>
+    <string name="please_notice">The video selected is first copied to the Temp directory, then is compressed and moved to the Compressed Videos directory and finally the Temp directory is empty.</string>
+    <string name="item_prompt">Select Medium</string>
 </resources>

@@ -4,13 +4,44 @@
     package="com.aps.apsschool.user">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/school_logo_final"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
+        <activity android:name=".TeacherLogin"></activity>
+        <activity android:name="com.aps.apsschool.home.ExoPlayerActivity"></activity>
+        <activity android:name="com.aps.apsschool.Dashboard" />
+        <activity android:name="com.aps.apsschool.upload.UploadLectureDetails" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.aps.apsschool.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true"
+            tools:replace="android:authorities">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"
+                tools:replace="android:resource" />
+        </provider>
+
+        <activity android:name="com.aps.apsschool.welcome.TeacherOrStudent" />
+        <activity
+            android:name="com.aps.apsschool.home.PlayerActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode">
+            <intent-filter>
+                <action android:name="com.aps.apsschool.welcome.SchoolWelcomeScreen" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.aps.apsschool.upload.UploadLectures" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
@@ -19,7 +50,7 @@
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorAccent" />
 
-        <activity android:name=".Blank"></activity>
+        <activity android:name=".Blank" />
         <activity android:name="com.aps.apsschool.welcome.BlankWelcomeScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -60,6 +91,7 @@
             android:configChanges="orientation|screenSize">
             <intent-filter>
                 <action android:name="com.android.apsschool.home.MainActivity" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>

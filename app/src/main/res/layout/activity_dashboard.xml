@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:ads="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@mipmap/school_background_foreground"
-    tools:context="com.aps.apsschool.home.SelectSubject">
+    tools:context="com.aps.apsschool.Dashboard">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/my_toolbar"
@@ -24,10 +23,11 @@
 
         <ImageView
             android:id="@+id/menu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
             android:layout_gravity="left"
-            app:srcCompat="@drawable/menu_icon_foreground" />
+            app:srcCompat="@drawable/upload"
+            android:onClick="goToUploads"/>
 
         <TextView
             android:id="@+id/class_id"
@@ -43,45 +43,33 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
-            app:srcCompat="@drawable/log_out_icon_foreground" />
+            app:srcCompat="@drawable/log_out_icon_foreground"
+            android:onClick="logout"/>
 
     </androidx.appcompat.widget.Toolbar>
 
-    <ScrollView
-        android:id="@+id/rootScrollView"
+    <LinearLayout
+        android:id="@+id/rootLectureUploadsLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:layout_marginBottom="50dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
+        android:orientation="vertical"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/my_toolbar"
-        app:layout_constraintVertical_bias="0.44">
+        app:layout_constraintTop_toBottomOf="@id/my_toolbar"/>
 
-        <LinearLayout
-            android:id="@+id/rootLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/my_toolbar" />
-
-    </ScrollView>
-
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
+    <Button
+        android:id="@+id/button_login"
+        android:layout_width="54dp"
         android:layout_height="wrap_content"
-        android:indeterminateDrawable="@drawable/progress"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:background="@drawable/active_button"
+        android:text="+"
+        android:textSize="40sp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:onClick="goToUploads"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
